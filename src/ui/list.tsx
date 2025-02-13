@@ -1,35 +1,48 @@
 "use client";
+import { useState } from "react";
 import { toDoType } from "@/lib/definitions";
-import { MdDoneOutline } from "react-icons/md";
-import { IoMdCloseCircleOutline } from "react-icons/io";
-import { GrInProgress } from "react-icons/gr";
-import { deleteToDo } from "@/lib/data";
+import { deleteToDo } from "@/lib/actions";
+import CreateForm from "./create-form";
+import ListItem from "./list-item";
+import { toast } from "react-toastify";
 export default function List({ list }: { list: toDoType[] }) {
-  function handleDelete(id: number) {
-    console.log(id);
-    deleteToDo(id);
+  const [todos, setTodos] = useState(list);
+
+  async function handleDelete(id: number) {
+    const prevTodos = todos;
+    setTodos(todos.filter((todo) => todo.id !== id));
+    const result = await deleteToDo(id);
+    if (!result.success) {
+      setTodos(prevTodos);
+      toast.error("Failed to delete task. Please try again.");
+    }
+  }
+  function toggleComplete(id: number) {
+    console.log("toggle");
+    console.log(todos);
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
   }
   return (
-    <ul className="flex flex-col gap-3">
-      {list &&
-        list.map((item) => (
-          <li
-            key={item.id}
-            className="flex justify-between gap-2 items-center border-2 p-2"
-          >
-            <p>{item.title}</p>
-            <div>
-              <span>
-                {item.completed ? (
-                  <MdDoneOutline color="green" />
-                ) : (
-                  <GrInProgress color="red" />
-                )}
-              </span>
-              <button onClick={() => handleDelete(item.id)}>Delete</button>
-            </div>
-          </li>
-        ))}
-    </ul>
+    <>
+      <CreateForm setToDos={setTodos}></CreateForm>
+      <ul className="mx-auto mt-10 space-y-4">
+        {todos.length > 0 ? (
+          todos.map((item) => (
+            <ListItem
+              key={item.id}
+              item={item}
+              handleDelete={handleDelete}
+              toggleComplete={toggleComplete}
+            ></ListItem>
+          ))
+        ) : (
+          <p>No To Dos</p>
+        )}
+      </ul>
+    </>
   );
 }

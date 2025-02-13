@@ -1,4 +1,3 @@
-//types
 export type toDoType = {
   userId: number;
   id: number;
