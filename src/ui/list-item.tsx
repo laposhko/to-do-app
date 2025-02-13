@@ -12,7 +12,7 @@ export default function ListItem({
   return (
     <li
       key={item.id}
-      className="flex min-w-2xl items-center justify-between p-4 bg-white shadow-md rounded-lg border border-gray-200"
+      className="flex sm:min-w-l items-center justify-between p-4 bg-white shadow-md rounded-lg border border-gray-200"
     >
       <input
         type="checkbox"
@@ -21,7 +21,7 @@ export default function ListItem({
         className="w-5 h-5 text-blue-500 border-gray-300 rounded focus:ring focus:ring-blue-200"
       />
       <p
-        className={`text-lg p-2  ${
+        className={`text-lg p-2   ${
           item.completed ? "line-through text-gray-400" : "text-gray-900"
         }`}
       >

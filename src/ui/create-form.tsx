@@ -4,34 +4,43 @@ import { createToDo } from "@/lib/actions";
 import { toDoType } from "@/lib/definitions";
 import { generateNumericId } from "@/lib/utils";
 import { toast } from "react-toastify";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-type CreateFormProps = {
-  setToDos: React.Dispatch<React.SetStateAction<toDoType[]>>;
-};
-export default function CreateForm({ setToDos }: CreateFormProps) {
+export default function CreateForm() {
   const [input, setInput] = useState("");
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: createToDo,
+    onMutate: async (newTodo) => {
+      await queryClient.cancelQueries({ queryKey: ["todos"] });
 
+      const previousTodos = queryClient.getQueryData(["todos"]);
+
+      queryClient.setQueryData(["todos"], (oldTodos: toDoType[]) => [
+        newTodo,
+        ...oldTodos,
+      ]);
+
+      return { previousTodos };
+    },
+    onError: (err, newTodo, context) => {
+      queryClient.setQueryData(["todos"], context?.previousTodos);
+      toast.error("Failed to add task. Please try again.");
+    },
+  });
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const title = formData.get("title") as string;
-    const newToDoId = Number(generateNumericId());
     if (!title.trim()) return;
-    setToDos((prevState) => [
-      {
-        id: newToDoId,
-        userId: Number(generateNumericId()),
-        title,
-        completed: false,
-      },
-      ...prevState,
-    ]);
+    const newToDo: toDoType = {
+      id: Number(generateNumericId()),
+      userId: Number(generateNumericId()),
+      title,
+      completed: false,
+    };
+    mutation.mutate(newToDo);
     setInput("");
-    const result = await createToDo({ title });
-    if (!result.success) {
-      setToDos((prev) => prev.filter((todo) => todo.id !== newToDoId));
-      toast.error("Failed to add task. Please try again.");
-    }
   }
 
   return (
