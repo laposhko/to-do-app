@@ -5,6 +5,7 @@ import { toDoType } from "@/lib/definitions";
 import { generateNumericId } from "@/lib/utils";
 import { toast } from "react-toastify";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { IoCreateOutline } from "react-icons/io5";
 
 export default function CreateForm() {
   const [input, setInput] = useState("");
@@ -44,7 +45,7 @@ export default function CreateForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-3 mt-6">
+    <form onSubmit={handleSubmit} className="flex items-center gap-6 mt-6">
       <input
         type="text"
         name="title"
@@ -56,9 +57,12 @@ export default function CreateForm() {
       <button
         type="submit"
         disabled={input.trim().length == 0}
-        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-300 "
+        className="p-3 disabled:text-amber-300 hover:scale-110 cursor-pointer"
       >
-        Add
+        <IoCreateOutline
+          color={input.trim().length === 0 ? "gray" : "black"}
+          size="40px"
+        ></IoCreateOutline>
       </button>
     </form>
   );

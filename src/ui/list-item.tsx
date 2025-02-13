@@ -1,4 +1,6 @@
 import { toDoType } from "@/lib/definitions";
+import { MdDelete } from "react-icons/md";
+
 type ListItemProps = {
   item: toDoType;
   handleDelete: (id: number) => void;
@@ -28,10 +30,10 @@ export default function ListItem({
         {item.title}
       </p>
       <button
-        className="text-sm sm:text-lg lg:text-2xl  px-3 py-1 text-white bg-red-600 hover:bg-red-700 rounded-md"
+        className="p-3 cursor-pointer hover:scale-110 "
         onClick={() => handleDelete(item.id)}
       >
-        Delete
+        <MdDelete color="black" size="30px"></MdDelete>
       </button>
     </li>
   );
